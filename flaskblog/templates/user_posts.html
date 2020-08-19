@@ -1,0 +1,42 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    {# 一、展示某位用户的所有post，依据传入的【该用户的某一页posts】而定  #}
+    {# 与home.html不同的是：在页首显示用户名和该用户一共发布的post文章数量 #}
+    <h1 class="mb-3">Posts by {{ user.username }} (共{{ posts.total }}篇文章)</h1>
+    {% for post in posts.items %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ url_for("static", filename="profile_pics/" + post.author.image_file) }}">
+            <div class="media-body">
+                <div class="article-metadata">
+                    {# post.author.username将输出每篇博文对应的用户，并且指向了该用户的user_posts.html。 #}
+                    <a class="mr-2" href="{{ url_for("users.set_user_posts", username=post.author.username) }}">{{ post.author.username }}</a>
+                    <small class="text-muted">{{ post.post_date.strftime("%Y-%m-%d %H-%M-%S") }}</small>
+                </div>
+                <h2><a class="article-title" href="{{ url_for("posts.set_read_post", post_id=post.id) }}">{{ post.title }}</a></h2>
+                <p class="article-content">{{ post.content }}</p>
+            </div>
+        </article>
+    {% endfor %}
+
+    {# 二、展示某位用户的所有post的所有页码，与传入的【该用户的某一页posts】自身页码无关！  #}
+
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {# 1、遍历得到的页码不为None时 #}
+        {% if page_num %}
+            {# 情况 1：遍历得到的page_num刚好等于传入的【该用户的某一页posts】自身页码时，表现为页码按钮激活 #}
+            {% if page_num == posts.page %}
+            {# 每个页码按钮都绑定一个超链接url：user/username?page=page_num #}
+            <a class="btn btn-info mb-4" href="{{ url_for("users.set_user_posts",username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {# 情况 2：遍历得到的page_num不等于传入的【该用户的某一页posts】自身页码时，表现为页码按钮不激活 #}
+            {% else %}
+            <a class="btn btn-outline-info mb-4" href="{{ url_for("users.set_user_posts",username=user.username, page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {# 2、遍历得到的页码为None时 #}
+        {% else %}
+            ...
+        {% endif %}
+
+    {% endfor %}
+{% endblock content %}
+

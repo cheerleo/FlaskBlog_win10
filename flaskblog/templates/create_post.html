@@ -1,0 +1,47 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+    <div class="content-section">
+        <form method="POST" action="">     {# 这里action后面不加路径表示表单post到我们当前所在的路径route下 #}
+            {{ post_form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"> {{ legend }} </legend>
+                <div class="form-group">
+                    {{ post_form.title.label(class="form-control-label") }}
+                    {% if post_form.title.errors %}
+                        {{ post_form.title(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in post_form.title.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ post_form.title(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ post_form.content.label(class="form-control-label") }}
+                    {% if post_form.content.errors %}
+                        {{ post_form.content(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in post_form.content.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ post_form.content(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ post_form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+
+
+{% endblock content %}                   {# home.html独有的内容使用endblock语句结束，后面的content可以不需要，这里为了区分 #}
+
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}

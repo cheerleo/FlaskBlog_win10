@@ -1,0 +1,124 @@
+{% extends "layout.html" %}                    {# 这里表示继承自layout.html #}
+{% block content %}                            {# block content中的内容是home.html独有的 #}
+
+{###########################################     注册表单html基本框架     #############################################
+                    1、注册信息输入框
+                    <form method='POST'>
+                        {{ register_form.hidden_tag() }}
+                        {{ register_form.username.label() }} : {{ register_form.username() }}
+                        {{ register_form.submit() }}
+                    </form>
+                    2、已有账户时，直接进入登录界面的入口
+                    <small class="text-muted">
+                        Already Have An Account? 已经有账号了吗？<a href="{{ url_for('users.set_login') }}">Log In</a>
+                    </small>
+
+       基于这个设计逻辑框架，加以扩展，用不同的div标签包裹、信息输入不符合要求的报错、bootstrap样式等，形成完整漂亮的页面。
+
+####################################################################################################################}
+
+    {# 一、设置整个register信息交互框体 #}
+
+    <div class="content-section">
+
+        {# 定义register信息交互框体 #}
+        <form method="POST" action="">         {# action后面不加路径表示表单post到我们当前所在的路径route下 #}
+            {{ register_form.hidden_tag() }}   {# 设置hidden_tag()模板参数，该参数将被替换为一个隐藏字段，用来实现在配置中激活的 CSRF 保护。如果已经激活了CSRF，这个字段需要出现在所有的表单中。#}
+
+    {# 二、设置接收各种register信息的输入框和提交按钮 #}
+    {# username、email、password、confirm_password、submit都是我们在RegistrationForm里定义好的类变量 #}
+
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"> Join Today！现在加入我们吧~ </legend> {# 设置框体的标题 #}
+
+                {# 1、设置username输入框 #}
+                <div class="form-group">
+                    {#（1）设置username输入框的标签 #}
+                    {{ register_form.username.label(class="form-control-label") }}
+                    {#（2）设置username输入框，接收用户输入的username，并判断用户输入是否符合RegistrationForm类中定义的要求 #}
+                    {# 情况 1 ：如果username输入不符合要求，提取错误，并报错 #}
+                    {% if register_form.username.errors %}
+                        {{ register_form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in register_form.username.errors %}  {# for循环提取所有的错误error #}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {# 情况 2 ：username输入符合要求，正常执行 #}
+                    {% else %}
+                        {{ register_form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                {# 2、设置email输入框 #}
+                <div class="form-group">
+                    {{ register_form.email.label(class="form-control-label") }}
+                    {% if register_form.email.errors %}
+                        {{ register_form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in register_form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ register_form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                {# 3、设置password输入框 #}
+                <div class="form-group">
+                    {{ register_form.password.label(class="form-control-label") }}
+                    {% if register_form.password.errors %}
+                        {{ register_form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in register_form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ register_form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                {# 4、设置confirm_password输入框 #}
+                <div class="form-group">
+                    {{ register_form.confirm_password.label(class="form-control-label") }}
+                    {% if register_form.confirm_password.errors %}
+                        {{ register_form.confirm_password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in register_form.confirm_password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ register_form.confirm_password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            {# 5、设置submit按钮 #}
+            {# 【注意】submit也是我们在RegistrationForm里定义好的类变量！！ #}
+            <div class="form-group">
+                {{ register_form.submit(class="btn btn-outline-info") }}
+            </div>
+
+        </form>
+
+    </div>
+
+    {# 三、设置框体底部的小字，已有账户的用户可直接点击进入登录页面 #}
+
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            <!-- 这里使用url_for方法，自动定位主py文件中的set_login方法，生成url链接 -->
+            Already Have An Account? 已经有账号了吗？<a class="ml-2" href="{{ url_for('users.set_login') }}">Log In</a>
+        </small>
+    </div>
+
+{% endblock content %}
+
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}

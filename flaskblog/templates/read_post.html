@@ -1,0 +1,51 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是home.html独有的 #}
+
+    <article class="media content-section">
+        <img class="rounded-circle article-img" src="{{ url_for("static", filename="profile_pics/" + post.author.image_file) }}">
+        <div class="media-body">
+            <div class="article-metadata">
+                {# post.author.username将输出每篇博文对应的用户，并且指向了该用户的user_posts.html。 #}
+                <a class="mr-2" href="{{ url_for("users.set_user_posts", username=post.author.username) }}">{{ post.author.username }}</a>
+                <small class="text-muted">{{ post.post_date.strftime("%Y-%m-%d %H-%M-%S") }}</small>     {# post.date_posted将输出每篇博文对应的post_date，同时利用strftime格式化 > #}
+                {# 当前打开的博文作者与当前用户相同时，出现Update和Delete按钮 #}
+                {% if post.author == current_user %}
+                <div>
+                    {# （1）设置Update按钮，以及按钮指向的set_update_post视图函数页面 #}
+                    <a class="btn btn-secondary btn-sm mt-1 mb-1" href="{{ url_for("posts.set_update_post", post_id=post.id) }}">Update</a>
+                    {# （2）设置Delete按钮，该按钮基于Boostrap Modal设计，将在页面顶部出现弹窗信息 #}
+                    <button type="button" class="btn btn-danger btn-sm m-1" data-toggle="modal" data-target="#deleteModal">Delete</button>
+                </div>
+                {% endif %}
+            </div>
+            <h2 class="text-muted">{{ post.title }}</h2>
+            <p class="article-content">{{ post.content }}</p>                 {# post.content将输出每篇博文对应的content > #}
+        </div>
+    </article>
+
+    {# 设置Boostrap的deleteModal #}
+    {# 【注意】该步骤是Modal模块必须的，详见https://getbootstrap.com/docs/4.0/components/modal/ #}
+    <div class="modal fade" id="deleteModal" tabindex="-1" role="dialog" aria-labelledby="deleteModalLabel" aria-hidden="true">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    {# （1）定义Modal弹窗的标题 #}
+                    <h5 class="modal-title" id="deleteModalLabel">确定要删除？</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-footer">
+                    {# （2）定义Modal弹窗的下方操作按钮 #}
+                    {# 弹窗的第一个按键为Close，是Bootstrap Modal预设好的 #}
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    {# 弹窗的第二个按键为Delete，是我们利用form表单 + POST方法设置的 #}
+                    <form action="{{ url_for("posts.set_delete_post", post_id=post.id) }}" method="POST">
+                        <input class="btn btn-danger" type="submit" value="Delete">
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock content %}                   {# home.html独有的内容使用endblock语句结束，后面的content可以不需要，这里为了区分 #}

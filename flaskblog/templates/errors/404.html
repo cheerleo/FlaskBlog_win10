@@ -1,0 +1,9 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+    <div>
+        <h1>Oops. Page Not Found (404)</h1>
+        <p>抱歉，页面不存在，请尝试其他地址。</p>
+    </div>
+{% endblock content %}
+
+{# 错误代码404表示的是该URL未定义，页面不存在 #}

@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!-- 一、导入Bootstrap模块 -->
+
+    <!-- （1）以CDN形式引入Bootstrap需要的 meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <!-- （2）以CDN形式引入Bootstrap需要的 CSS -->
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css" integrity="sha384-9aIt2nRpC12Uk9gS9baDl411NQApFmC26EwAOH8WgZl5MYYxFfc+NcPb1dKGj7Sk" crossorigin="anonymous">
+
+    <!-- 二、导入做好的css文件 -->
+
+    <!-- 重要：使用url_for方法，查找static文件夹并定位其中的main.css文件，生成url，提取main.css来渲染网页。相当于直接写 href="/static/main.css" -->
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
+
+    {% if title %}
+        <title>{{ title }}</title>
+    {% else %}
+        <title>天天Blog</title>
+    {% endif %}
+</head>
+<body>
+    <!-- 三、定义页面主体设计 -->
+
+    <!-- 1、定义 Navigation bar 模块：页面顶部的一条导航栏（包含Home、About、右侧的Login和Register） -->
+    <header class="site-header">
+      <nav class="navbar navbar-expand-md navbar-dark bg-steel fixed-top">
+        <div class="container">
+          <a class="navbar-brand mr-4" href="/">天天Blog</a>
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarToggle" aria-controls="navbarToggle" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarToggle">
+            <div class="navbar-nav mr-auto">
+              <a class="nav-item nav-link" href={{ url_for("main.set_home") }}>Home</a>        {# 使用url_for直接定位视图函数，防止对应的app.route("/路径")修改之后这里还要相应更新 #}
+              <a class="nav-item nav-link" href={{ url_for("main.set_about") }}>About</a>
+            </div>
+
+            <!-- 2、顶部右上角的导航栏。未登录时显示Login和Register，用户已登录时显示Account和Logout -->
+            <div class="navbar-nav">
+                <!-- （1）如果用户处于登录状态，导航栏显示如下内容： -->
+                {% if current_user.is_authenticated %}
+                    <a class="nav-item nav-link" href={{ url_for("posts.set_new_post") }}>New Post</a>
+                    <a class="nav-item nav-link" href={{ url_for("users.set_user_posts", username=current_user.username) }}>My Posts</a>
+                    <a class="nav-item nav-link" href={{ url_for("users.set_account") }}>{{ current_user.username }}的账户</a>
+                    <a class="nav-item nav-link" href={{ url_for("users.set_logout") }}>Logout</a>
+                <!-- （2）如果用户未登录，导航栏显示如下内容： -->
+                {% else %}
+                    <a class="nav-item nav-link" href={{ url_for("users.set_login") }}>Login</a>
+                    <a class="nav-item nav-link" href={{ url_for("users.set_register") }}>Register</a>
+                {% endif %}
+            </div>
+          </div>
+        </div>
+      </nav>
+    </header>
+
+    <!-- 3、定义页面主模块框架 -->
+    <main role="main" class="container">
+      <div class="row">
+        <div class="col-md-8">
+            {# （1）定义flash闪现提示（一次性，刷新之后消失） #}
+            {# 法 1 ：with到endwith语句定义了注册成功的flash提示。get_flashed_messages用于提取视图函数中定义的flash消息 #}
+            {# with语句：类似于Python中的with关键字，它可以限制with语句块内对象的作用域 #}
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }}">
+                            {{ message }}
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+            {# 【注意】messages在with代码块之外是不可见的！！ #}
+
+            {# 法 2 ：以下这种也可以，不用with包裹 #}
+{#            {% for category, message in get_flashed_messages(with_categories=true) %}        {# get_flashed_messages的返回值等具体细节，详见flask的helpers.py文档 #}
+{#                <div class="alert alert-{{ category }}">#}
+{#                    {{ message }}                          {# 这里展示了最终显示给用户的信息message，具体消息内容在主py文件中通过flash(f"xxx", "success")定义了 #}
+{#                </div>#}
+{#            {% endfor %}#}
+
+          {#（2）【非常重要】为其他html文件特有的代码预留的接口 #}
+          {# block中间的内容是其他home、about等html文件特有的，需要在各自的html文件中添加定义 #}
+          {#【注意】其他html文件继承layout模板时，特有的代码必须写在block中，写在block之外的代码不会执行！！！ #}
+          {% block content %}{% endblock %}
+
+        </div>
+
+        <!-- 4、定义side bar的模块 -->
+        <div class="col-md-4">
+          <div class="content-section">
+            <h3>Our Sidebar</h3>
+            <p class='text-muted'>You can put any information here you'd like.
+              <ul class="list-group">
+                <li class="list-group-item list-group-item-light">Latest Posts</li>
+                <li class="list-group-item list-group-item-light">Announcements</li>
+                <li class="list-group-item list-group-item-light">Calendars</li>
+                <li class="list-group-item list-group-item-light">etc</li>
+              </ul>
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+
+    <!-- 一、导入Bootstrap模块 -->
+
+    <!-- 【注意】以下也属于导入Bootstrap模块的部分 -->
+    <!-- （3）以CDN形式引入Bootstrap需要的 JavaScript模块 -->
+    <!-- 注意顺序：jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/js/bootstrap.min.js" integrity="sha384-OgVRvuATP1z7JjHLkuOU7Xw704+h835Lr+6QL9UvYjZE3Ipu6Tp75j7Bh/kR0JKI" crossorigin="anonymous"></script>
+</body>
+</html>
+
+{# 【要点】：
+1、layout.html的作用：把home.html、about.html等文件中重复的部分放到layout.html中，在home、about等文件中继承调用即可，避免重复写一样的代码
+2、两种注释方法：
+（1）<!-- xxxx --> 是html格式的注释方法，将在网页源代码中【显示】，但是【不执行】
+（2） {# xxxx #}  {# 是Jinja2的注释方法，在网页源代码中【不显示】，同样【不执行】
+3、使用url_for直接定位视图函数，防止对应的app.route("/路径")有所修改 #}
+
+
+
+
+

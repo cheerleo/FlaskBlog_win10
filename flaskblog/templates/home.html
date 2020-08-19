@@ -1,0 +1,124 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是home.html独有的 #}
+
+{###########################################     主页业务逻辑     ############################################################
+
+    （1）主页默认展示第一页（page_num=1）所有的post，第一页的页码按钮激活 ---> （2）用户点击页码按钮发起GET请求(URL:"/home?page=page_num")
+     ---> （3）set_home视图函数中通过request.args.get("page")获取新的page_num ---> （4）通过paginate(page=page_num)查询数据库
+     ---> （5）获取新的page_num页码对应的所有post --->  （6）再传入home.html中，渲染展示所有获取的post
+
+#############################################################################################################################}
+
+    {# 一、定义主页展示的post排版，依据传入的【某一页posts】而定  #}
+    {# 通过遍历传入的posts，在页面展现post  #}
+    {# 【牢记】：这里的posts只是某一页的，是set_home视图函数中定义的posts = Post.query.paginate(page=page_num, per_page=2) #}
+    {# 【注意】：因为使用了paginate()方法自动分页，因此规定必须用posts.items才能获取分页后的所有post信息 #}
+    {% for post in posts.items %}
+        <article class="media content-section">
+            <img class="rounded-circle article-img" src="{{ url_for("static", filename="profile_pics/" + post.author.image_file) }}">
+            <div class="media-body">
+                <div class="article-metadata">
+                    {# post.author.username将输出每篇博文对应的用户，并且指向了该用户的user_posts.html。 #}
+                    <a class="mr-2" href="{{ url_for("users.set_user_posts", username=post.author.username) }}">{{ post.author.username }}</a>
+                    <small class="text-muted">{{ post.post_date.strftime("%Y-%m-%d %H-%M-%S") }}</small>       {# post.date_posted将输出每篇博文对应的post_date，同时利用strftime格式化 #}
+                </div>
+                {# post.title将输出每篇博文对应的title #}
+                {# 每个title都由href="xx"指向set_read_post视图函数，完整的url依据不同的post.id而定，最终指向每个post各自的独立展示页面read_post.html #}
+                <h2><a class="article-title" href="{{ url_for("posts.set_read_post", post_id=post.id) }}">{{ post.title }}</a></h2>
+                <p class="article-content">{{ post.content }}</p>                 {# post.content将输出每篇博文对应的content #}
+            </div>
+        </article>
+    {% endfor %}                         {# 逻辑语句必须要用endxxx结束！！这里用{% endfor %}来结束for逻辑语句  #}
+
+    {# 二、定义主页下方展示的页码，将展示所有的页码，与传入的【某一页posts】自身页码无关！  #}
+
+    {# posts.iter_pages得到所有页码，对所有页码遍历 #}
+    {# left/right_edge、left/right_current表示当前页码按钮左右显示的页码按钮个数。#}
+    {# 【注意】right_current包含当前页码按钮本身。#}
+    {% for page_num in posts.iter_pages(left_edge=1, right_edge=1, left_current=1, right_current=2) %}
+        {# 1、遍历得到的页码不为None时 #}
+        {% if page_num %}
+            {# 情况 1：遍历得到的page_num刚好等于传入的【某一页posts】自身页码时，表现为页码按钮激活 #}
+            {% if page_num == posts.page %}
+            {# 每个page_num值都用bootstrap格式包裹成页码按钮，每个页码按钮都绑定一个超链接url：/home?page=page_num #}
+            {# 用户每次点击按钮，都将发起一次GET请求"/home?page=page_num"，page_num将被set_home视图函数捕获并显示对应页码的所有post文章 #}
+            <a class="btn btn-info mb-4" href="{{ url_for("main.set_home", page=page_num) }}">{{ page_num }}</a>
+            {# 情况 2：遍历得到的page_num不等于传入的【某一页posts】自身页码时，表现为页码按钮不激活 #}
+            {% else %}
+            <a class="btn btn-outline-info mb-4" href="{{ url_for("main.set_home", page=page_num) }}">{{ page_num }}</a>
+            {% endif %}
+        {# 2、遍历得到的页码为None时 #}
+        {% else %}
+        {# 页码为None是因为页码太多，为了美观有些页码将被自动省略，这里我们用"..."来代替None  #}
+            ...
+        {% endif %}
+
+    {% endfor %}
+{% endblock content %}                   {# home.html独有的内容使用endblock语句结束，后面的content可以不需要，这里为了区分 #}
+
+
+
+{#
+【注意】：
+
+一、分页查询的语法：
+
+1、根据条件获取posts
+（1）查询所有post --- 未限定页码
+posts = Post.query.paginate(per_page=3)
+（2）查询某一页的所有post --- 限定了页码为5
+posts = Post.query.paginate(page=5, per_page=3)
+
+2、对查询到的posts进行遍历
+【注意】必须对posts.items遍历，而不是直接对posts遍历
+for post in posts.items:
+    print(post)
+
+3、查看所有已储存的post共能分成多少页
+【注意】paginate()方法中可添加page=page_num参数，不影响分页结果，只有per_page参数会影响分页结果
+posts = Post.query.paginate(per_page=3)
+posts.pages
+
+4、查看数据库中一共有多少个post
+【注意】paginate()方法中可添加page=page_num参数，不影响total总数的显示，per_page参数也不影响
+posts = Post.query.paginate(per_page=3)
+posts.total
+
+5、获取当前posts所处的页码
+posts.page，注意与posts.pages区分！！
+
+6、遍历并输出所有的页码
+for page in posts.iter_pages():
+    print(page)
+【注意】遍历的结果可能出现None，这是由于页码过多，有些页码在页面显示时会被隐藏起来，例如：
+1
+2
+3
+4
+5
+None  -----> 这里的None将表现为页面上的省略号"..."
+7
+8
+
+
+以数据库中已存储23条post为例：
+
+>>> posts = Post.query.paginate(per_page=3)
+>>> posts.page
+1
+>>> posts.pages
+8
+>>> posts.total
+23
+
+>>> posts1 = Post.query.paginate(page=2, per_page=3)
+>>> posts1.page
+2
+>>> posts1.pages
+8
+>>> posts1.total
+23
+
+
+
+#}

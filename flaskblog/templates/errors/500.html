@@ -1,0 +1,9 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+    <div>
+        <h1>Something went wrong (500)</h1>
+        <p>抱歉，服务器出错。请稍后重试，谢谢！</p>
+    </div>
+{% endblock content %}
+
+{# 错误代码500表示的是general mistake，没有明确的错误原因 #}

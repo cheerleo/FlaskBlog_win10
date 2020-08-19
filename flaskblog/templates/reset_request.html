@@ -1,0 +1,40 @@
+{% extends "layout.html" %}
+{% block content %}
+
+    <div class="content-section">
+        <form method="POST" action="">
+            {{ request_form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                Reset Password 重置密码
+                </legend>
+                <div class="form-group">
+                    {{ request_form.email.label(class="form-control-label") }}
+                    {% if request_form.email.errors %}        {# 表示：如果form中的email输入有误，则执行下述代码 #}
+                        {{ request_form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in request_form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}                        {# 表示：如果form中的email输入没有错误，则执行下述代码 #}
+                        {{ request_form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ request_form.submit(class="btn btn-outline-info") }}
+            </div>
+        </form>
+    </div>
+
+{% endblock content %}
+
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}

@@ -1,0 +1,9 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+    <div>
+        <h1>You don't have permission to do that (403)</h1>
+        <p>请确认登录的账户是否正确，谢谢！</p>
+    </div>
+{% endblock content %}
+
+{# 错误代码403表示的是用户没有权限 #}

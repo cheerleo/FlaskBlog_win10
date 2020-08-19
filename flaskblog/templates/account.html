@@ -1,0 +1,93 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+
+    {# 一、设置整个account信息展示及交互框体 #}
+
+    <div class="content-section">
+
+        {# （一）定义account信息展示框体 #}
+        <div class="media">
+            <img class="rounded-circle account-img" src="{{ image_file }}">    {# 传入routes里定义好的image路径 #}
+            <div class="media-body">
+                <h2 class="account-heading">{{ current_user.username }}</h2>   {# 使用current_user获取当前登录的用户信息 #}
+                <p class="text-secondary">{{ current_user.email }}</p>         {# 使用current_user获取当前登录的用户信息 #}
+            </div>
+        </div>
+
+        {# （二）定义account信息交互框体 #}
+        {# action后面不加路径表示表单post到我们当前所在的路径route下 #}
+        {# 【注意】必须要指定enctype，定义了encoding type，使得FileField的文件格式检验能正常运行！！ #}
+        <form method="POST" action="" enctype="multipart/form-data">
+            {# 设置hidden_tag()模板参数，该参数将被替换为一个隐藏字段，用来实现在配置中激活的 CSRF 保护。如果已经激活了CSRF，这个字段需要出现在所有的表单中。#}
+            {{ account_form.hidden_tag() }}
+
+    {# 二、设置接收各种account更新信息输入框和提交按钮 #}
+    {# username、email、picture、submit都是我们在RegistrationForm里定义好的类变量 #}
+
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4"> Account Info 账户信息 </legend> {# 设置框体的标题 #}
+
+                {# 1、设置username输入框 #}
+                <div class="form-group">
+                    {#（1）设置username输入框的标签 #}
+                    {{ account_form.username.label(class="form-control-label") }}
+                    {#（2）设置username输入框，接收用户输入的username，并判断用户输入是否符合UpdateAccountForm类中定义的要求 #}
+                    {# 情况 1 ：如果username输入不符合要求，提取错误，并报错 #}
+                    {% if account_form.username.errors %}
+                        {{ account_form.username(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in account_form.username.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {# 情况 2 ：username输入符合要求，正常执行 #}
+                    {% else %}
+                        {{ account_form.username(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                {# 2、设置email输入框 #}
+                <div class="form-group">
+                    {{ account_form.email.label(class="form-control-label") }}
+                    {% if account_form.email.errors %}
+                        {{ account_form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in account_form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                        {{ account_form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+
+                {# 3、设置picture载入框，errors的代码块写法与username和email不同 #}
+                <div class="form-group">
+                    {{ account_form.picture.label(class="form-control-label") }}
+                    {{ account_form.picture(class="form-control-file") }}
+                    {% if account_form.picture.errors %}
+                        {% for error in account_form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            {# 4、设置submit按钮 #}
+            <div class="form-group">
+                {{ account_form.submit(class="btn btn-outline-info") }}
+            </div>
+            <small class="text-muted">
+                <a href="{{ url_for("users.set_reset_request") }}">重置密码请点我，点我！</a>
+            </small>
+        </form>
+
+    </div>
+
+{% endblock content %}
+
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}

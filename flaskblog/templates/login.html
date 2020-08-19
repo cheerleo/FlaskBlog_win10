@@ -1,0 +1,67 @@
+{% extends "layout.html" %}                {# 这里表示继承自layout.html #}
+{% block content %}                        {# block content中的内容是home.html独有的 #}
+    <div class="content-section">
+        <form method="POST" action="">     {# 这里action后面不加路径表示表单post到我们当前所在的路径route下 #}
+            {{ login_form.hidden_tag() }}
+            <fieldset class="form-group">
+                <legend class="border-bottom mb-4">
+                Login 登录
+                </legend>
+                <div class="form-group">
+                    {{ login_form.email.label(class="form-control-label") }}
+                    {% if login_form.email.errors %}        {# 表示：如果form中的email输入有误，则执行下述代码 #}
+                        {{ login_form.email(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in login_form.email.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}                        {# 表示：如果form中的email输入没有错误，则执行下述代码 #}
+                        {{ login_form.email(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-group">
+                    {{ login_form.password.label(class="form-control-label") }}
+                    {% if login_form.password.errors %}     {# 表示：如果form中的password输入有误，则执行下述代码 #}
+                        {{ login_form.password(class="form-control form-control-lg is-invalid") }}
+                        <div class="invalid-feedback">
+                            {% for error in login_form.password.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% else %}                        {# 表示：如果form中的password输入正确，则执行下述代码 #}
+                        {{ login_form.password(class="form-control form-control-lg") }}
+                    {% endif %}
+                </div>
+                <div class="form-check">
+                    {{ login_form.remember(class="form-check-input") }}
+                    {{ login_form.remember.label(class="form-check-label") }}
+                </div>
+            </fieldset>
+            <div class="form-group">
+                {{ login_form.submit(class="btn btn-outline-info") }}
+                <small class="text-muted">
+                    <a href="{{ url_for("users.set_reset_request") }}">Forgot Password? 忘记密码了？</a>
+                </small>
+            </div>
+
+        </form>
+    </div>
+    <div class="border-top pt-3">
+        <small class="text-muted">
+            <!-- 这里使用url_for方法，自动定位主py文件中的set_login方法，生成url链接 -->
+            Need An Account? 需要注册吗？<a class="ml-2" href=" {{ url_for('users.set_register') }}">Register Now</a>
+        </small>
+    </div>
+
+
+{% endblock content %}
+
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}
+{#
+【注意】：
+由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}
