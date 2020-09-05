@@ -5,6 +5,6 @@ from wtforms.validators import DataRequired
 # 定义前端post博文的表单
 class PostForm(FlaskForm):
 
-    title = StringField("Title", validators=[DataRequired()])
-    content = TextAreaField("content", validators=[DataRequired()])
+    title = StringField("标题", validators=[DataRequired()])
+    content = TextAreaField("正文", validators=[DataRequired()])
     submit = SubmitField("Post")
