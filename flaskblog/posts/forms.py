@@ -6,5 +6,5 @@ from wtforms.validators import DataRequired
 class PostForm(FlaskForm):
 
     title = StringField("标题", validators=[DataRequired()])
-    content = TextAreaField("正文", validators=[DataRequired()])
+    content = TextAreaField("正文", id="content")  # 注意：id="content"表示使用设置好的TinyMCE编辑器，与validators=[DataRequired()]不能共用，否则无法提交！！！！
     submit = SubmitField("Post")

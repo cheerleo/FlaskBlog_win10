@@ -1,4 +1,13 @@
 {% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+
+{% block head %}
+    <script src="{{ url_for('static', filename='tinymce/js/tinymce/tinymce.min.js') }}"></script>   {# 导入TinyMCE编辑器必须的基础文件 #}
+    <script src="{{ url_for('static', filename='js/tinymce_setup.js') }}"></script>                 {# 导入TinyMCE编辑器自定义配置文件 #}
+
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='prism.css') }}">    {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>                         {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+{% endblock head %}
+
 {% block content %}                      {# block content中的内容是独有的 #}
     <div class="content-section">
         <form method="POST" action="">     {# 这里action后面不加路径表示表单post到我们当前所在的路径route下 #}

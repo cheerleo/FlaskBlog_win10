@@ -1,4 +1,11 @@
 {% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='prism.css') }}">    {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>                         {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+{% endblock head %}
+
+
 {% block content %}                      {# block content中的内容是home.html独有的 #}
 
 {###########################################     主页业务逻辑     ############################################################
@@ -25,7 +32,7 @@
                 {# post.title将输出每篇博文对应的title #}
                 {# 每个title都由href="xx"指向set_read_post视图函数，完整的url依据不同的post.id而定，最终指向每个post各自的独立展示页面read_post.html #}
                 <h2><a class="article-title" href="{{ url_for("posts.set_read_post", post_id=post.id) }}">{{ post.title }}</a></h2>
-                <p class="article-content">{{ post.content }}</p>                 {# post.content将输出每篇博文对应的content #}
+                <p class="article-content">{{ post.content|safe }}</p>                 {# post.content将输出每篇博文对应的content #}
             </div>
         </article>
     {% endfor %}                         {# 逻辑语句必须要用endxxx结束！！这里用{% endfor %}来结束for逻辑语句  #}
