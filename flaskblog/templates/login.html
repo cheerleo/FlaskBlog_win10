@@ -59,9 +59,5 @@
 
 {#
 【注意】：
-由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
-#}
-{#
-【注意】：
-由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+由于layout.html文件中留了{% block content %}{% block head %}两个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
 #}

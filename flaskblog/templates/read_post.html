@@ -1,4 +1,10 @@
 {% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+
+{% block head %}
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='prism.css') }}">    {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+    <script src="{{ url_for('static', filename='js/prism.js') }}"></script>                         {# 导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！！！ #}
+{% endblock head %}
+
 {% block content %}                      {# block content中的内容是home.html独有的 #}
 
     <article class="media content-section">
@@ -19,7 +25,7 @@
                 {% endif %}
             </div>
             <h2 class="text-muted">{{ post.title }}</h2>
-            <p class="article-content">{{ post.content }}</p>                 {# post.content将输出每篇博文对应的content > #}
+            <p class="article-content">{{ post.content|safe }}</p>                 {# post.content将输出每篇博文对应的content #}
         </div>
     </article>
 

@@ -1,5 +1,45 @@
 {% extends "layout.html" %}              {# 这里表示继承自layout.html #}
-{% block content %}                      {# block content中的内容是独有的 #}
+
+{% block head %}
+
+    {# 一、导入TinyMCE编辑器必须的基础文件 #}
+    <script src="{{ url_for('static', filename='tinymce/js/tinymce/tinymce.min.js') }}"></script>
+
+    {# 二、设置TinyMCE编辑器自定义配置，如何放到static文件夹中再导入待验证！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！！ #}
+    <script>
+      tinymce.init({
+        //选择id为tinymce_editor的标签作为编辑器，
+        //【注意】这里也是方便posts/forms.py文件中设置对应的表单区域content = TextAreaField("正文", id="tinymce_editor") ！！！
+        selector: '#tinymce_editor',
+        //语言选择中文
+        language:'zh_CN',
+        //编辑区高度为400
+        height:400,
+        //设置菜单栏按钮
+        plugins: [
+                'advlist autolink link image lists charmap print preview hr anchor pagebreak spellchecker',
+                'searchreplace wordcount visualblocks visualchars code fullscreen insertdatetime media nonbreaking',
+                'save table contextmenu directionality emoticons template paste textcolor',
+                'codesample',
+        ],
+        //设置工具栏按钮
+        toolbar: 'fontsizeselect forecolor backcolor emoticons |\
+                  bold italic | alignleft aligncenter alignjustify | \
+                  bullist | link image | preview fullpage | fullscreen',
+        //设置可选的字体大小
+        fontsize_formats: '10pt 12pt 14pt 18pt 24pt 36pt 48pt 72pt',
+        //按tab不换行
+        nonbreaking_force_tab: true,
+      });
+    </script>
+
+     {# 三、导入TinyMCE编辑代码块渲染格式的文件，待验证！！！！！！！！！！！！！ #}
+     {# <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='prism.css') }}">  #}
+     {# <script src="{{ url_for('static', filename='js/prism.js') }}"></script>  #}
+
+{% endblock head %}
+
+{% block content %}                        {# block content中的内容是独有的 #}
     <div class="content-section">
         <form method="POST" action="">     {# 这里action后面不加路径表示表单post到我们当前所在的路径route下 #}
             {{ post_form.hidden_tag() }}
@@ -43,5 +83,5 @@
 
 {#
 【注意】：
-由于layout.html文件中只留了{% block content %}{% endblock %}这个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+由于layout.html文件中留了{% block content %}{% block head %}两个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
 #}

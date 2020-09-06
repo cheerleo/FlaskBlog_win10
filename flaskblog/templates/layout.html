@@ -14,6 +14,9 @@
     <!-- 重要：使用url_for方法，查找static文件夹并定位其中的main.css文件，生成url，提取main.css来渲染网页。相当于直接写 href="/static/main.css" -->
     <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='main.css') }}">
 
+    {% block head %}
+    {% endblock head %}
+
     {% if title %}
         <title>{{ title }}</title>
     {% else %}
@@ -84,7 +87,8 @@
           {#（2）【非常重要】为其他html文件特有的代码预留的接口 #}
           {# block中间的内容是其他home、about等html文件特有的，需要在各自的html文件中添加定义 #}
           {#【注意】其他html文件继承layout模板时，特有的代码必须写在block中，写在block之外的代码不会执行！！！ #}
-          {% block content %}{% endblock %}
+          {% block content %}
+          {% endblock %}
 
         </div>
 
