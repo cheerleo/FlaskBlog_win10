@@ -31,6 +31,9 @@ class User(db.Model, UserMixin):
     image_file = db.Column(db.String(20), nullable=False, default="default.jpg") # 【注意】数据库储存的只是图片文件名。这里的default.jpg只是规定了默认的文件名称！！没有定义路径！
     password = db.Column(db.String(20), nullable=False)
 
+    # pic_name字段用于存储上传的待预测图片文件名！！
+    pic_name = db.Column(db.String(20), nullable=False, default="default_pred.jpg")
+
     # 【这里的posts并不是新增的column，而是与Post类相连，在Post类中增加一个column称为author。】 db.relationship的用法需要学习！！！！！！！
     # 【注意】由于author的存在，Post类对象.author等价于与其相对应的User类对象
     # 因此，print(Post类对象.author)等价于print(对应User类对象)，将输出"用户信息< 用户名：{对应User类对象.username}, 邮箱：{对应User类对象.email}, 头像：{对应User类对象.image_file} >"
@@ -83,18 +86,5 @@ class Post(db.Model):
     def __repr__(self):
         return f"博文信息< 文章标题：{self.title}, 发布时间：{self.post_date} >"
 
-
-# 3、创建名为Pred的表（table），管理predict图片文件名
-# 【注意 1】数据库储存的只是图片文件名。并非整个文件。
-# 【注意 2】这里的Pred表无需实际生成，Pred.pic_name只是用来作为中间变量使用，临时存放图片的文件名
-
-class Pred(db.Model):
-
-    id = db.Column(db.Integer, primary_key=True)
-    pic_name = db.Column(db.String(20), nullable=False, default="")
-    # 因为不实际生成Pred table，所以默认图片可以不在这里设定，在ai.html里通过Jinja2嵌入逻辑设置
-
-    def __repr__(self):
-        return f"上传的预测图片< 图片：{self.pic_name} >"
 
 
