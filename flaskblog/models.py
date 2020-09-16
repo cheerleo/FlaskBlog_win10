@@ -7,7 +7,7 @@ from flask_login import UserMixin
 
 ################################################################################################
 #                                      【 后 端 数 据 库 设 置  】                                #
-# ----------------------------- models文件：设置后端数据库中的各类table  --------—--------------#
+# ----------------------------- models文件：设置后端数据库中的各类table  --------—-----------------#
 #   ！！！！！！！！！！！！！！   注意区分后端数据库table和前端的form表单  ！！！！！！！！！！！！！！！！ #
 ################################################################################################
 
@@ -24,11 +24,11 @@ def load_user(user_id):
 
 class User(db.Model, UserMixin):
     # （1）设置table相关属性
-    # __tablename__ = "User"                                                    # 用于设置table的名字，table表名默认为类名User
-    id = db.Column(db.Integer, primary_key=True)                                # 定义为primary_key的属性会自动生成编号
-    username = db.Column(db.String(20), unique=True, nullable=False)            # db.String(20)中的20表示限制最大length，nullable=False表示不能为空
+    # __tablename__ = "User"                                                     # 用于设置table的名字，table表名默认为类名User
+    id = db.Column(db.Integer, primary_key=True)                                 # 定义为primary_key的属性会自动生成编号
+    username = db.Column(db.String(20), unique=True, nullable=False)             # db.String(20)中的20表示限制最大length，nullable=False表示不能为空
     email = db.Column(db.String(120), unique=True, nullable=False)
-    image_file = db.Column(db.String(20), nullable=False, default="default.jpg")
+    image_file = db.Column(db.String(20), nullable=False, default="default.jpg") # 【注意】数据库储存的只是图片文件名。这里的default.jpg只是规定了默认的文件名称！！没有定义路径！
     password = db.Column(db.String(20), nullable=False)
 
     # 【这里的posts并不是新增的column，而是与Post类相连，在Post类中增加一个column称为author。】 db.relationship的用法需要学习！！！！！！！
@@ -61,8 +61,6 @@ class User(db.Model, UserMixin):
             return None                           # 如果因为token过期、token错误等各种情况，解析不出user_id，则返回None
         return User.query.get(user_id)            # 利用解析出的user_id（即self.id），查询对应的账户信息
 
-
-
     # （4）定义了直接print(User类对象)的输出内容
     def __repr__(self):
         return f"用户信息< 用户名：{self.username}, 邮箱：{self.email}, 头像：{self.image_file} >"
@@ -84,3 +82,19 @@ class Post(db.Model):
     # （2）定义了直接print(Post类对象)的输出内容
     def __repr__(self):
         return f"博文信息< 文章标题：{self.title}, 发布时间：{self.post_date} >"
+
+
+# 3、创建名为Pred的表（table），管理predict图片文件名
+# 【注意 1】数据库储存的只是图片文件名。并非整个文件。
+# 【注意 2】这里的Pred表无需实际生成，Pred.pic_name只是用来作为中间变量使用，临时存放图片的文件名
+
+class Pred(db.Model):
+
+    id = db.Column(db.Integer, primary_key=True)
+    pic_name = db.Column(db.String(20), nullable=False, default="")
+    # 因为不实际生成Pred table，所以默认图片可以不在这里设定，在ai.html里通过Jinja2嵌入逻辑设置
+
+    def __repr__(self):
+        return f"上传的预测图片< 图片：{self.pic_name} >"
+
+

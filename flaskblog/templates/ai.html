@@ -1,0 +1,66 @@
+{% extends "layout.html" %}              {# 这里表示继承自layout.html #}
+{% block content %}                      {# block content中的内容是独有的 #}
+
+    <div class="content-section">
+
+        {# （一）定义predict图片展示框体 #}
+        <legend class="border-bottom mb-4"> AI图像识别 </legend> {# 设置框体的标题 #}
+        <div class="media">
+            {% if pic_url == "/static/predict_pics/Pred.pic_name" %}             {# 这里表示没有图片上传时，显示默认default_pred.jpg #}
+                <img src={{ url_for("static", filename="predict_pics/default_pred.jpg") }} >
+            {% else %}
+                <img src={{ pic_url }} >
+            {% endif %}
+        </div>
+
+        {# （二）定义predict图片上传的交互框体 #}
+        {# action后面不加路径表示表单post到我们当前所在的路径route下 #}
+        {# 【注意】必须要指定enctype，定义了encoding type，使得FileField的文件格式检验能正常运行！！ #}
+        <form method="POST" action="" enctype="multipart/form-data">
+            {# 设置hidden_tag()模板参数，该参数将被替换为一个隐藏字段，用来实现在配置中激活的 CSRF 保护。如果已经激活了CSRF，这个字段需要出现在所有的表单中。#}
+            {{ predict_form.hidden_tag() }}
+
+    {# 二、设置接收各种account更新信息输入框和提交按钮 #}
+    {# picture、submit都是我们在PredictForm里定义好的类变量 #}
+
+            <fieldset class="form-group">
+
+                {# 设置picture载入框 #}
+                <div class="form-group">
+                    {{ predict_form.picture.label(class="form-control-label") }}
+                    {{ predict_form.picture(class="form-control-file") }}
+                    {% if predict_form.picture.errors %}
+                        {% for error in predict_form.picture.errors %}
+                            <span class="text-danger">{{ error }}</span>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+
+            </fieldset>
+
+            {# 设置上传、预测按钮 #}
+            <div>
+                {{ predict_form.submit(class="btn btn-outline-info") }}
+                {% if pic_url != "/static/predict_pics/Pred.pic_name" %}  {# 这里表示当有图片上传时，才显示预测按钮 #}
+                    <a class="btn btn-outline-info" href="{{ url_for("main.predict") }}">预测</a>
+                {% endif %}
+            </div>
+
+
+        </form>
+        <small>
+            使用说明：Step 1 选择文件 -> Step 2 点击上传 -> Step 3 点击预测 <br>
+            🍉 V1.0版本，基于MobileNet模型训练 <br>
+            🍉 目前仅支持五种花卉的分类识别
+        </small>
+    </div>
+
+
+
+
+{% endblock content %}
+
+{#
+【注意】：
+由于layout.html文件中留了{% block content %}{% block head %}两个接口，其他html文件的特有代码必须要写在接口中，写在接口之外的代码无法运行！！！
+#}

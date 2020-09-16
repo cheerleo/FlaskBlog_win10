@@ -20,6 +20,7 @@
     {# 通过遍历传入的posts，在页面展现post  #}
     {# 【牢记】：这里的posts只是某一页的，是set_home视图函数中定义的posts = Post.query.paginate(page=page_num, per_page=2) #}
     {# 【注意】：因为使用了paginate()方法自动分页，因此规定必须用posts.items才能获取分页后的所有post信息 #}
+
     {% for post in posts.items %}
         <article class="media content-section">
             <img class="rounded-circle article-img" src="{{ url_for("static", filename="profile_pics/" + post.author.image_file) }}">

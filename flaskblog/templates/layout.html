@@ -37,7 +37,7 @@
           <div class="collapse navbar-collapse" id="navbarToggle">
             <div class="navbar-nav mr-auto">
               <a class="nav-item nav-link" href={{ url_for("main.set_home") }}>Home</a>        {# 使用url_for直接定位视图函数，防止对应的app.route("/路径")修改之后这里还要相应更新 #}
-              <a class="nav-item nav-link" href={{ url_for("main.set_about") }}>About</a>
+              <a class="nav-item nav-link" href={{ url_for("main.set_ai") }}>AI识别测试</a>
             </div>
 
             <!-- 2、顶部右上角的导航栏。未登录时显示Login和Register，用户已登录时显示Account和Logout -->
@@ -93,6 +93,7 @@
         </div>
 
         <!-- 4、定义side bar的模块 -->
+
         <div class="col-md-4">
           <div class="content-section">
             <h3>Our Sidebar</h3>

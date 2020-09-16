@@ -136,7 +136,7 @@ def set_account():
         account_form.username.data = current_user.username
         account_form.email.data = current_user.email
 
-    # 【设置POST方法】：用户填完表单数据，点击submit按钮（数据库表结构中设置了名为“Update”），即发送了POST请求
+    # 【设置POST方法】：用户填完表单数据，点击submit按钮（users/forms.py中设置了名为“Update”），即发送了POST请求
     # 调用validate_on_submit()方法，则默认用户使用 "POST" 方法传入信息。
     elif account_form.validate_on_submit():
 
