@@ -1,7 +1,9 @@
 from flask import render_template, url_for, flash, request, Blueprint, current_app, jsonify, redirect
-from flaskblog.models import Post, Pred
+from flaskblog.models import Post
 from flaskblog.main.forms import PredictForm
 from flaskblog.main.utils import save_pred_picture
+from flask_login import current_user, login_required
+from flaskblog import db
 
 import os
 import json
@@ -46,17 +48,18 @@ def set_home():
 # 三、定义"/ai"图像分类预测主页面
 # set_ai视图函数主要用于读取并展示图片
 # 【注意】
-# （1）没有图片上传时，print(Pred.pic_name)输出Pred.pic_name，此时pic_url为"/static/predict_pics/Pred.pic_name"
-# （2）发生图片上传时，print(Pred.pic_name)输出{文件名}，此时pic_url为"/static/predict_pics/{文件名}"
+# （1）没有图片上传时，print(current_user.pic_name)输出current_user.pic_name，此时pic_url为"/static/predict_pics/current_user.pic_name"
+# （2）发生图片上传时，print(current_user.pic_name)输出{文件名}，此时pic_url为"/static/predict_pics/{文件名}"
 
 @main.route("/ai", methods=["GET", "POST"])
+@login_required
 def set_ai():
 
     predict_form = PredictForm()
 
     # 【设置GET方法】：展示读取的图片
     # 已通过jinja2实现有图片上传时，显示上传的图片
-    print(f"新POST前导入的图片名：{Pred.pic_name}")  # 如果没有图片上传，则输出Pred.pic_name
+    print(f"新POST前导入的图片名：{current_user.pic_name}")  # 如果没有图片上传，则输出current_user.pic_name
 
     # 【设置POST方法】：用户填完表单数据，点击submit按钮
     if predict_form.validate_on_submit():
@@ -64,24 +67,25 @@ def set_ai():
         if predict_form.picture.data:
             pic_name = save_pred_picture(predict_form.picture.data)
             # 【注意】save_pred_picture的作用是存储读取的图片、输出自定义的文件名
-            Pred.pic_name = pic_name
-            # 这里的Pred.pic_name是两个路由"/ai"和"/ai/predict"之间传递图像的关键桥梁，但实际上并没有在db文件中创建Pred的实例！！！！！！！！
-    print(f"导入的图片名：{Pred.pic_name}")
-    pic_url = url_for("static", filename=f"predict_pics/{Pred.pic_name}")
+            current_user.pic_name = pic_name
+            # 这里的current_user.pic_name是两个路由"/ai"和"/ai/predict"之间传递图像的关键桥梁，但实际上并没有在db文件中创建Pred的实例！！！！！！！！
+            db.session.commit()
+
+    print(f"导入的图片名：{current_user.pic_name}")
+    pic_url = url_for("static", filename=f"predict_pics/{current_user.pic_name}")
 
     print(f"导入的图片保存路径：{pic_url}")
-    # 参考set_account里的：image_file = url_for("static", filename=f"profile_pics/{current_user.image_file}")
-
     return render_template("ai.html", title="预测图片", predict_form=predict_form, pic_url=pic_url)
 
 # 四、定义"/ai/predict"预测主routes
 @main.route("/ai/predict", methods=["GET", "POST"])
 @torch.no_grad()                   # torch.no_grad()提高测试运行效率
+@login_required
 def predict():
     # 1. 定义模型初始化相关信息
     # （1）定义权重文件和类别说明文件的路径
-    weights_path = f"{current_app.root_path}/static/mobile_net/MobileNetV2(flower).pth"  # 【注意】这里必须用current_app定位路径，用url_for会报错！！
-    class_json_path = f"{current_app.root_path}/static/mobile_net/class_indices.json"  # 【注意】这里必须用current_app定位路径，用url_for会报错！！
+    weights_path = f"{current_app.root_path}/static/mobile_net/MobileNetV2(flower).pth"  # 【注意】这里必须用current_user定位路径，用url_for会报错！！
+    class_json_path = f"{current_app.root_path}/static/mobile_net/class_indices.json"  # 【注意】这里必须用current_user定位路径，用url_for会报错！！
     assert os.path.exists(weights_path), "抱歉，无法执行预测，模型权重文件不存在"  # assert后面的判断语句如果为false，程序崩溃抛出异常。
     assert os.path.exists(class_json_path), "抱歉，无法执行预测，类别说明文件不存在"
     # （2）选择设备：cpu或者gpu
@@ -104,7 +108,7 @@ def predict():
                                             [0.485, 0.456, 0.406],
                                             [0.229, 0.224, 0.225])])
 
-    img_pil = Image.open(f"{current_app.root_path}/static/predict_pics/{Pred.pic_name}")       # 传入要预测的图片s2.jpg
+    img_pil = Image.open(f"{current_app.root_path}/static/predict_pics/{current_user.pic_name}")       # 传入要预测的图片s2.jpg
     img_tensor = my_transforms(img_pil)
     img_tensor = img_tensor.to(device)
     img_tensor = torch.unsqueeze(img_tensor, dim=0)      # 【重要】使用unsqueeze添加batch_size的维度，使该tensor符合模型运算要求。shape变为torch.Size([1, 3, 224, 224])

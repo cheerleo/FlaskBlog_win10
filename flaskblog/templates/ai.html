@@ -6,11 +6,7 @@
         {# （一）定义predict图片展示框体 #}
         <legend class="border-bottom mb-4"> AI图像识别 </legend> {# 设置框体的标题 #}
         <div class="media">
-            {% if pic_url == "/static/predict_pics/Pred.pic_name" %}             {# 这里表示没有图片上传时，显示默认default_pred.jpg #}
-                <img src={{ url_for("static", filename="predict_pics/default_pred.jpg") }} >
-            {% else %}
-                <img src={{ pic_url }} >
-            {% endif %}
+            <img src={{ pic_url }} >
         </div>
 
         {# （二）定义predict图片上传的交互框体 #}
